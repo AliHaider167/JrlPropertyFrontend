@@ -26,6 +26,7 @@ const AdminPropertyForm = () => {
 
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -62,6 +63,25 @@ const AdminPropertyForm = () => {
     setForm({ ...form, images: form.images.filter((_, i) => i !== idx) });
   };
 
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setError("");
+    try {
+      const data = new FormData();
+      data.append("video", file);
+      const res = await api.post("/properties/upload-video", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setForm({ ...form, videoUrl: res.data.url });
+    } catch (err) {
+      setError(err.response?.data?.message || "Video upload failed.");
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -93,9 +113,14 @@ const AdminPropertyForm = () => {
         {isEdit ? "Edit Property" : "Add New Property"}
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-white border border-navy-900/10 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8 bg-white border border-navy-900/10 p-6"
+      >
         <div>
-          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Title</label>
+          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+            Title
+          </label>
           <input
             className="input-field"
             value={form.title}
@@ -105,7 +130,9 @@ const AdminPropertyForm = () => {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Description</label>
+          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+            Description
+          </label>
           <textarea
             className="input-field min-h-[120px]"
             value={form.description}
@@ -116,7 +143,9 @@ const AdminPropertyForm = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Price</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Price
+            </label>
             <input
               type="number"
               className="input-field"
@@ -126,7 +155,9 @@ const AdminPropertyForm = () => {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Currency</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Currency
+            </label>
             <input
               className="input-field"
               value={form.currency}
@@ -134,15 +165,23 @@ const AdminPropertyForm = () => {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Status</label>
-            <select className="input-field" value={form.status} onChange={(e) => handleChange("status", e.target.value)}>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Status
+            </label>
+            <select
+              className="input-field"
+              value={form.status}
+              onChange={(e) => handleChange("status", e.target.value)}
+            >
               <option value="for-sale">For Sale</option>
               <option value="under-offer">Under Offer</option>
               <option value="sold">Sold</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Type</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Type
+            </label>
             <select
               className="input-field"
               value={form.propertyType}
@@ -159,7 +198,9 @@ const AdminPropertyForm = () => {
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Bedrooms</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Bedrooms
+            </label>
             <input
               type="number"
               className="input-field"
@@ -168,7 +209,9 @@ const AdminPropertyForm = () => {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Bathrooms</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Bathrooms
+            </label>
             <input
               type="number"
               className="input-field"
@@ -177,7 +220,9 @@ const AdminPropertyForm = () => {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Area (sqft)</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Area (sqft)
+            </label>
             <input
               type="number"
               className="input-field"
@@ -189,15 +234,21 @@ const AdminPropertyForm = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Address Line</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Address Line
+            </label>
             <input
               className="input-field"
               value={form.location.addressLine}
-              onChange={(e) => handleLocationChange("addressLine", e.target.value)}
+              onChange={(e) =>
+                handleLocationChange("addressLine", e.target.value)
+              }
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">City</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              City
+            </label>
             <input
               className="input-field"
               value={form.location.city}
@@ -206,7 +257,9 @@ const AdminPropertyForm = () => {
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Country</label>
+            <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+              Country
+            </label>
             <input
               className="input-field"
               value={form.location.country}
@@ -216,25 +269,83 @@ const AdminPropertyForm = () => {
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Video URL (embed link, optional)</label>
+        {/* <div>
+          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+            Video URL (embed link, optional)
+          </label>
           <input
             className="input-field"
             placeholder="https://www.youtube.com/embed/..."
             value={form.videoUrl}
             onChange={(e) => handleChange("videoUrl", e.target.value)}
           />
+        </div> */}
+
+        <div>
+          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+            Property Video (optional)
+          </label>
+          <p className="text-xs text-navy-700/50 mb-2">
+            Either upload a video file directly, or paste a YouTube/Vimeo embed
+            link below — you only need one of the two.
+          </p>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleVideoUpload}
+            className="text-sm"
+          />
+          {uploadingVideo && (
+            <p className="text-xs text-navy-700/60 mt-2">Uploading video...</p>
+          )}
+
+          <input
+            className="input-field mt-3"
+            placeholder="Or paste a link — https://www.youtube.com/embed/..."
+            value={form.videoUrl}
+            onChange={(e) => handleChange("videoUrl", e.target.value)}
+          />
+
+          {form.videoUrl && (
+            <div className="flex items-center justify-between mt-2 text-xs text-navy-700/60 bg-navy-950/[0.03] border border-navy-900/10 p-2">
+              <span className="truncate mr-2">{form.videoUrl}</span>
+              <button
+                type="button"
+                onClick={() => handleChange("videoUrl", "")}
+                className="text-red-600 hover:underline shrink-0"
+              >
+                Clear
+              </button>
+            </div>
+          )}
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">Photos</label>
-          <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="text-sm" />
-          {uploading && <p className="text-xs text-navy-700/60 mt-2">Uploading...</p>}
+          <label className="block text-xs uppercase tracking-wide text-navy-700/60 mb-2">
+            Photos
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageUpload}
+            className="text-sm"
+          />
+          {uploading && (
+            <p className="text-xs text-navy-700/60 mt-2">Uploading...</p>
+          )}
           {form.images.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
               {form.images.map((img, idx) => (
-                <div key={img + idx} className="relative aspect-square overflow-hidden border border-navy-900/10">
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                <div
+                  key={img + idx}
+                  className="relative aspect-square overflow-hidden border border-navy-900/10"
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
@@ -273,7 +384,11 @@ const AdminPropertyForm = () => {
           <button type="submit" className="btn-primary" disabled={saving}>
             {saving ? "Saving..." : isEdit ? "Save Changes" : "Create Property"}
           </button>
-          <button type="button" className="btn-outline" onClick={() => navigate("/admin/dashboard")}>
+          <button
+            type="button"
+            className="btn-outline"
+            onClick={() => navigate("/admin/dashboard")}
+          >
             Cancel
           </button>
         </div>
